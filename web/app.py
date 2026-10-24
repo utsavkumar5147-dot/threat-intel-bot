@@ -18,6 +18,7 @@ from retry_policy import initialize_retry_policy
 
 def create_app():
     app = Flask(__name__)
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024
 
     initialize()
     initialize_queue()

@@ -21,6 +21,20 @@ This project integrates VirusTotal and AbuseIPDB to investigate public IP addres
 - Flask dashboard and REST API
 - Explicit consent for external investigations
 
+
+## SOC Dashboard
+
+The interactive dark-mode dashboard includes:
+
+- Sidebar navigation and live backend status
+- Investigation, monitoring, and notification counters
+- Threat risk distribution donut chart
+- Recent IOC risk-score visualization
+- Searchable investigation history
+- Risk-level filters and colored status badges
+
+Dashboard statistics use actual investigation records.
+
 ## Architecture
 
 Dashboard -> Flask API -> IOC Validation -> Job Queue -> Background Worker
@@ -40,6 +54,33 @@ Python, Flask, SQLite, JavaScript, HTML, VirusTotal API, AbuseIPDB API.
 - config/ : Local configuration
 - data/ : SQLite database
 - reports/ : Generated investigation reports
+
+## Installation
+
+Clone the repository:
+
+    git clone https://github.com/utsavkumar5147-dot/threat-intel-bot.git
+    cd threat-intel-bot
+
+Create a virtual environment and install dependencies:
+
+    python3 -m venv .venv
+    ./.venv/bin/python -m pip install -r requirements.txt
+
+Configure your local API credentials using
+config/api_keys.env.example as a reference.
+
+Never commit real API keys to GitHub.
+
+## Deployment and Security Limitations
+
+- The Flask dashboard is intended for local use at 127.0.0.1.
+- The dashboard has no authentication; do not expose it directly to the internet.
+- API request bodies are limited to 16 KB.
+- Automated external investigations currently support public IPs only.
+- External enrichment requires explicit authorization and valid API keys.
+- Risk scores are heuristic and do not prove that an IOC is safe.
+- External provider availability and rate limits can affect investigations.
 
 ## Running the Application
 
@@ -76,11 +117,29 @@ Start the background worker in a separate terminal:
 - Interrupted-job recovery
 - Fresh database initialization
 
+
+## Automated Testing and CI
+
+The project includes 33 automated pytest tests covering:
+
+- IOC classification and input validation
+- Investigation queue operations
+- Threat risk-scoring calculations
+
+Run all tests locally:
+
+    ./.venv/bin/python -m pytest tests/ -v
+
+GitHub Actions automatically runs the test suite on
+pushes and pull requests targeting the main branch.
+
+Additional integration checks cover Flask API responses,
+external lookup consent, and investigation submission.
+
 ## Future Improvements
 
 - Domain, URL, and hash enrichment
 - Additional threat intelligence providers
-- Automated testing and CI
 - Containerized deployment
 - Improved monitoring and visualization
 

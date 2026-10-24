@@ -40,3 +40,6 @@ reports/*.json
 # Local source-code backups
 *.bak
 *.pre_*.bak
+
+# Runtime worker lock files
+data/*.lock

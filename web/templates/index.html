@@ -121,10 +121,57 @@
       .metrics { grid-template-columns: 1fr; }
     }
   </style>
+  <link rel="stylesheet" href="/static/dashboard.css">
 </head>
 
 <body>
-  <header>
+
+<div class="soc-shell">
+  <aside class="soc-sidebar" id="socSidebar">
+    <div class="soc-brand">
+      <span class="soc-brand-icon">⬡</span>
+      <div>
+        <strong>SENTINEL<span>INTEL</span></strong>
+        <small>THREAT OPERATIONS</small>
+      </div>
+    </div>
+
+    <div class="soc-nav-title">WORKSPACE</div>
+
+    <nav class="soc-nav" aria-label="Dashboard navigation">
+      <a href="#dashboard" class="soc-nav-link active">
+        <span>◈</span> Overview
+      </a>
+      <a href="#analytics" class="soc-nav-link"><span>◉</span> Threat Analytics</a>
+      <a href="#investigate" class="soc-nav-link">
+        <span>⌕</span> IOC Investigation
+      </a>
+      <a href="#history" class="soc-nav-link">
+        <span>▤</span> Investigation History
+      </a>
+      <a href="#monitoring" class="soc-nav-link">
+        <span>◎</span> IOC Monitoring
+      </a>
+      <a href="#alerts" class="soc-nav-link">
+        <span>◇</span> Risk Notifications
+      </a>
+    </nav>
+
+    <div class="soc-sidebar-footer">
+      <span class="soc-pulse"></span>
+      <div>
+        <strong>Threat Intel Engine</strong>
+        <small>Local security workspace</small>
+      </div>
+    </div>
+  </aside>
+  <div class="soc-content">
+
+  <header id="dashboard">
+    <div class="soc-topline">
+      <span>SECURITY OPERATIONS / OVERVIEW</span>
+      <span class="soc-live-label">● LIVE DASHBOARD</span>
+    </div>
     <div class="eyebrow">Cybersecurity / Threat Intelligence</div>
     <h1>Automated Threat Intelligence</h1>
     <p>IOC Enrichment Bot · Independent Investigation Dashboard</p>
@@ -132,7 +179,71 @@
   </header>
 
   <main>
-    <section class="card" style="margin-bottom:24px">
+    <section class="metrics">
+      <div class="card">
+        <div class="metric-label">Investigations</div>
+        <div class="metric-value" id="investigationsCount">—</div>
+      </div>
+
+      <div class="card">
+        <div class="metric-label">Monitored IOCs</div>
+        <div class="metric-value" id="monitoredCount">—</div>
+      </div>
+
+      <div class="card">
+        <div class="metric-label">Notifications</div>
+        <div class="metric-value" id="notificationsCount">—</div>
+      </div>
+
+      <div class="card">
+        <div class="metric-label">Active Jobs</div>
+        <div class="metric-value" id="activeJobsCount">—</div>
+      </div>
+    </section>
+
+
+<section class="analytics-grid" id="analytics">
+  <article class="card analytics-card">
+    <div class="analytics-heading">
+      <div>
+        <span class="analytics-kicker">THREAT ANALYTICS</span>
+        <h2>Risk Distribution</h2>
+      </div>
+      <span class="analytics-tag">LIVE DATA</span>
+    </div>
+    <div class="risk-chart-layout">
+      <div id="riskDonut" class="risk-donut"
+           role="img" aria-label="Risk distribution">
+        <div class="risk-donut-center">
+          <strong id="riskTotal">0</strong>
+          <span>Investigations</span>
+        </div>
+      </div>
+      <div class="risk-legend">
+        <div><i class="risk-dot high"></i>High <strong id="riskHigh">0</strong></div>
+        <div><i class="risk-dot elevated"></i>Elevated <strong id="riskElevated">0</strong></div>
+        <div><i class="risk-dot guarded"></i>Guarded <strong id="riskGuarded">0</strong></div>
+        <div><i class="risk-dot low"></i>Low <strong id="riskLow">0</strong></div>
+        <div><i class="risk-dot unknown"></i>Unknown <strong id="riskUnknown">0</strong></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="card analytics-card">
+    <div class="analytics-heading">
+      <div>
+        <span class="analytics-kicker">INVESTIGATION INSIGHTS</span>
+        <h2>Recent IOC Risk Scores</h2>
+      </div>
+      <span class="analytics-tag">LATEST 6</span>
+    </div>
+    <div id="riskBars" class="risk-bars">
+      <p>No investigation data available.</p>
+    </div>
+  </article>
+</section>
+
+    <section class="card workbench" id="investigate">
       <h2>IOC Investigation Workbench</h2>
       <p>Enter an IP address, domain, URL, or SHA-256 hash to classify it.</p>
 
@@ -174,31 +285,30 @@
       </div>
     </section>
 
-    <section class="metrics">
-      <div class="card">
-        <div class="metric-label">Investigations</div>
-        <div class="metric-value" id="investigationsCount">—</div>
-      </div>
-
-      <div class="card">
-        <div class="metric-label">Monitored IOCs</div>
-        <div class="metric-value" id="monitoredCount">—</div>
-      </div>
-
-      <div class="card">
-        <div class="metric-label">Notifications</div>
-        <div class="metric-value" id="notificationsCount">—</div>
-      </div>
-
-      <div class="card">
-        <div class="metric-label">Active Jobs</div>
-        <div class="metric-value" id="activeJobsCount">—</div>
-      </div>
-    </section>
-
     <section class="grid">
-      <article class="card wide">
-        <h2>Investigation History</h2>
+      <article class="card wide" id="history">
+
+<h2>Investigation History</h2>
+<div class="history-toolbar">
+  <input
+    id="historySearch"
+    type="search"
+    placeholder="Search IOC, type or status..."
+    aria-label="Search investigations"
+  >
+  <select id="historyRiskFilter"
+          aria-label="Filter investigations by risk">
+    <option value="all">All risk levels</option>
+    <option value="High">High</option>
+    <option value="Elevated">Elevated</option>
+    <option value="Guarded">Guarded</option>
+    <option value="Low">Low</option>
+    <option value="Unknown">Unknown</option>
+  </select>
+  <span id="historyCount" class="history-count"
+        aria-live="polite"></span>
+</div>
+
         <div class="table-wrap">
           <table>
             <thead>
@@ -217,7 +327,7 @@
         </div>
       </article>
 
-      <article class="card">
+      <article class="card" id="monitoring">
         <h2>Monitored Indicators</h2>
         <div class="table-wrap">
           <table>
@@ -231,7 +341,7 @@
         </div>
       </article>
 
-      <article class="card">
+      <article class="card" id="alerts">
         <h2>Risk Notifications</h2>
         <div class="table-wrap">
           <table>
@@ -247,6 +357,11 @@
     </section>
   </main>
 
+  <script src="/static/analytics.js" defer></script>
+  <script src="/static/history.js" defer></script>
   <script src="/static/app.js" defer></script>
+  </div>
+</div>
+  <script src="/static/navigation.js" defer></script>
 </body>
 </html>

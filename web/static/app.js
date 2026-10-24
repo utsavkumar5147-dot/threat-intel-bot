@@ -91,6 +91,10 @@ async function refreshDashboard() {
             ]
         );
 
+        renderRiskAnalytics(investigations);
+
+        enhanceHistory(investigations);
+
         renderTable(
             "monitoredRows",
             monitored,

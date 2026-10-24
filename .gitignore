@@ -1,0 +1,42 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+*.db
+logs/
+/config/api_keys.env
+
+
+# API credentials and secrets
+config/api_keys.env
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local investigation databases
+data/*.db
+data/*.db-*
+data/*.sqlite
+data/*.sqlite3
+
+# Generated investigation reports
+reports/*.json
+
+# Logs
+*.log
+
+# Operating system files
+.DS_Store
+
+# Local source-code backups
+*.bak
+*.pre_*.bak

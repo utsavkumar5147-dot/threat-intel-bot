@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Threat Intelligence | IOC Enrichment Bot</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080f1c;
+      --panel: #111e30;
+      --border: #283b51;
+      --text: #ecf4ff;
+      --muted: #94a8be;
+      --accent: #36c6d5;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    header {
+      padding: 30px max(20px, calc((100vw - 1200px)/2));
+      border-bottom: 1px solid var(--border);
+      background: #0d192a;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h1 { margin: 10px 0; font-size: clamp(24px, 4vw, 38px); }
+    h2 { margin-top: 0; font-size: 18px; }
+    p { color: var(--muted); line-height: 1.6; }
+
+    main {
+      max-width: 1240px;
+      margin: auto;
+      padding: 28px 20px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      padding: 22px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      min-width: 0;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .metric-value {
+      font-size: 38px;
+      font-weight: 700;
+      margin-top: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .wide { grid-column: 1 / -1; }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 13px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th { color: var(--muted); font-weight: 600; }
+    td { overflow-wrap: anywhere; }
+
+    .empty {
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .status {
+      color: var(--accent);
+      font-size: 13px;
+    }
+
+    @media(max-width: 760px) {
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+      .grid { grid-template-columns: 1fr; }
+      .wide { grid-column: auto; }
+    }
+
+    @media(max-width: 430px) {
+      .metrics { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="eyebrow">Cybersecurity / Threat Intelligence</div>
+    <h1>Automated Threat Intelligence</h1>
+    <p>IOC Enrichment Bot · Independent Investigation Dashboard</p>
+    <div class="status" id="connectionStatus">Connecting to backend...</div>
+  </header>
+
+  <main>
+    <section class="card" style="margin-bottom:24px">
+      <h2>IOC Investigation Workbench</h2>
+      <p>Enter an IP address, domain, URL, or SHA-256 hash to classify it.</p>
+
+      <form id="iocForm" style="display:flex;gap:12px;flex-wrap:wrap">
+        <input
+          id="iocInput"
+          type="text"
+          placeholder="Enter IOC, e.g. 8.8.8.8"
+          maxlength="2048"
+          required
+          style="flex:1;min-width:220px;padding:14px;background:#080f1c;color:#ecf4ff;border:1px solid #283b51;border-radius:8px"
+        >
+        <button
+          type="submit"
+          style="padding:14px 22px;background:#36c6d5;color:#08111c;border:0;border-radius:8px;font-weight:700;cursor:pointer"
+        >
+          Classify IOC
+        </button>
+      </form>
+
+      <div style="margin-top:16px;display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+        <label style="display:flex;align-items:center;gap:8px">
+          <input id="externalConsent" type="checkbox">
+          I authorize external threat-intelligence lookups
+        </label>
+
+        <button id="investigateBtn" type="button"
+                style="padding:12px 20px;background:#3659d5;color:white;border:0;border-radius:8px;cursor:pointer">
+          Investigate IOC
+        </button>
+      </div>
+
+      <div id="investigationResult" role="status" aria-live="polite"
+           style="margin-top:12px;color:#94a8be"></div>
+
+      <div id="iocResult" role="status" aria-live="polite"
+           style="margin-top:18px;color:#94a8be">
+        Enter an indicator to begin.
+      </div>
+    </section>
+
+    <section class="metrics">
+      <div class="card">
+        <div class="metric-label">Investigations</div>
+        <div class="metric-value" id="investigationsCount">—</div>
+      </div>
+
+      <div class="card">
+        <div class="metric-label">Monitored IOCs</div>
+        <div class="metric-value" id="monitoredCount">—</div>
+      </div>
+
+      <div class="card">
+        <div class="metric-label">Notifications</div>
+        <div class="metric-value" id="notificationsCount">—</div>
+      </div>
+
+      <div class="card">
+        <div class="metric-label">Active Jobs</div>
+        <div class="metric-value" id="activeJobsCount">—</div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card wide">
+        <h2>Investigation History</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Indicator</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Risk Score</th>
+                <th>Investigated At</th>
+              </tr>
+            </thead>
+            <tbody id="investigationRows">
+              <tr><td colspan="5" class="empty">Loading investigations...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Monitored Indicators</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Indicator</th><th>Status</th><th>Last Risk</th></tr>
+            </thead>
+            <tbody id="monitoredRows">
+              <tr><td colspan="3" class="empty">Loading monitored IOCs...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Risk Notifications</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Indicator</th><th>Severity</th><th>Notification</th></tr>
+            </thead>
+            <tbody id="notificationRows">
+              <tr><td colspan="3" class="empty">Loading notifications...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
